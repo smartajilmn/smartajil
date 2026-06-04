@@ -1471,25 +1471,7 @@
     </div>
   </div>
 </section>
-<!-- VIDEO SECTION -->
-<section style="background:#0D1F1A; padding:60px; text-align:center;">
-  <h2 style="font-family:'Playfair Display',serif; color:white; font-size:32px; margin-bottom:8px;">
-    Бидний үйлчилгээ
-  </h2>
-  <p style="color:rgba(255,255,255,0.5); margin-bottom:32px;">
-    Ажлын гар багажны вэб сайт
-  </p>
-  <div style="max-width:400px; margin:0 auto; border-radius:16px; overflow:hidden; box-shadow:0 20px 60px rgba(0,0,0,0.4);">
-    <iframe 
-      width="100%" 
-      height="700"
-      src="https://www.youtube.com/embed/wOx3MZUR-1Y"
-      frameborder="0"
-      allowfullscreen
-      style="display:block;">
-    </iframe>
-  </div>
-</section>
+
 <!-- HOW IT WORKS -->
 <section class="section" id="how">
   <div class="section-label">Хэрхэн ажилладаг</div>
@@ -1544,23 +1526,6 @@
   <p style="text-align:center;margin-top:12px;color:#888;font-size:13px;">Шууд холбогдоно — 24 цагийн дотор хариу өгнө</p>
 </section>
 
-<!-- JOBS -->
-<section class="jobs-section" id="jobs">
-  <div class="jobs-header">
-    <div class="jobs-header-text">
-      <div class="section-label">Нээлттэй ажлын байр</div>
-      <div class="section-title">Одоо нээлттэй<br>ажлын байрнууд</div>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-      <input type="text" id="jobSearch" placeholder="Хайх..." oninput="filterJobs(this.value)"
-        style="padding:10px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;width:180px;font-family:inherit;">
-      <button onclick="openPublicPost()" style="padding:10px 20px;background:linear-gradient(135deg,var(--green),var(--green-mid));color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">📢 Ажлын зар нэмэх</button>
-      <button class="add-job-btn" id="addJobBtn" onclick="openAddJob()">⚙️ Админ нэмэх</button>
-      <button id="importJobBtn" onclick="openImport()" style="display:none;padding:10px 20px;background:white;border:1.5px solid var(--green);color:var(--green);border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;align-items:center;gap:6px;">📥 Excel</button>
-    </div>
-  </div>
-  <div class="jobs-grid" id="jobsGrid"></div>
-</section>
 
 <!-- PORTFOLIO -->
 <section class="section" id="portfolio">
@@ -1751,6 +1716,25 @@
     </div>
   </div>
 </section>
+
+<!-- JOBS -->
+<section class="jobs-section" id="jobs">
+  <div class="jobs-header">
+    <div class="jobs-header-text">
+      <div class="section-label">Нээлттэй ажлын байр</div>
+      <div class="section-title">Одоо нээлттэй<br>ажлын байрнууд</div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+      <input type="text" id="jobSearch" placeholder="Хайх..." oninput="filterJobs(this.value)"
+        style="padding:10px 16px;border:1.5px solid #e2e8f0;border-radius:10px;font-size:14px;width:180px;font-family:inherit;">
+      <button onclick="openPublicPost()" style="padding:10px 20px;background:linear-gradient(135deg,var(--green),var(--green-mid));color:white;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;">📢 Ажлын зар нэмэх</button>
+      <button class="add-job-btn" id="addJobBtn" onclick="openAddJob()">⚙️ Админ нэмэх</button>
+      <button id="importJobBtn" onclick="openImport()" style="display:none;padding:10px 20px;background:white;border:1.5px solid var(--green);color:var(--green);border-radius:10px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;align-items:center;gap:6px;">📥 Excel</button>
+    </div>
+  </div>
+  <div class="jobs-grid" id="jobsGrid"></div>
+</section>
+
 
 <!-- CTA -->
 <section class="cta-section" id="contact">
@@ -2353,7 +2337,42 @@ var pfFilter = 'all';
 function getJobs(){try{var s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):DEFAULT_JOBS;}catch(e){return DEFAULT_JOBS;}}
 function saveJobs(j){localStorage.setItem(STORAGE_KEY,JSON.stringify(j));}
 function getPortfolio(){try{var s=localStorage.getItem(PORT_KEY);return s?JSON.parse(s):[];}catch(e){return[];}}
-function savePortfolio2(p){localStorage.setItem(PORT_KEY,JSON.stringify(p));}
+function savePortfolio2(p){
+  localStorage.setItem(PORT_KEY,JSON.stringify(p));
+  var st=getSettings();
+  if(!st.binKey||!st.binId) return;
+  // Load current bin data first, then update portfolio field
+  fetch('https://api.jsonbin.io/v3/b/'+st.binId+'/latest',{
+    headers:{'X-Master-Key':st.binKey,'X-Bin-Meta':'false'}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    var existing = (typeof data==='object'&&!Array.isArray(data)) ? data : {};
+    existing.portfolio = p;
+    return fetch('https://api.jsonbin.io/v3/b/'+st.binId,{
+      method:'PUT',
+      headers:{'Content-Type':'application/json','X-Master-Key':st.binKey},
+      body:JSON.stringify(existing)
+    });
+  })
+  .catch(function(){});
+}
+
+function loadPortfolioFromBin(){
+  var st=getSettings();
+  if(!st.binKey||!st.binId) return;
+  fetch('https://api.jsonbin.io/v3/b/'+st.binId+'/latest',{
+    headers:{'X-Master-Key':st.binKey,'X-Bin-Meta':'false'}
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    if(data&&data.portfolio&&data.portfolio.length){
+      localStorage.setItem(PORT_KEY,JSON.stringify(data.portfolio));
+      renderPortfolio();
+    }
+  })
+  .catch(function(){});
+}
 function getSettings(){try{var s=localStorage.getItem(SETT_KEY);return s?JSON.parse(s):{phone:'7211-7170',bank:'5400133881',owner:'Б.Жайнагүль',bankName:'Хаан банк'};}catch(e){return{phone:'7211-7170',bank:'5400133881',owner:'Б.Жайнагүль',bankName:'Хаан банк'};}}
 
 function fmt(n){return String.fromCharCode(8366)+n.toLocaleString();}
@@ -2898,6 +2917,7 @@ function submitApply(){
 renderJobs();
 renderPortfolio();
 loadFromJsonBin();
+loadPortfolioFromBin();
 // Apply saved Facebook URL
 (function(){ var s=getSettings(); if(s.fbUrl) applyFbUrl(s.fbUrl); })();
 
