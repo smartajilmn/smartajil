@@ -3031,7 +3031,7 @@ function renderPortfolio(){
       var ytId = p.videoId;
       var isTikTok = p.videoUrl && p.videoUrl.indexOf('tiktok.com') >= 0;
       if(ytId && !isTikTok){
-        media = '<div style="width:100%;aspect-ratio:16/9;overflow:hidden;background:#000"><iframe width="100%" height="100%" src="https://www.youtube.com/embed/'+ytId+'" frameborder="0" allowfullscreen style="display:block"></iframe></div>';
+        media = '<div style="width:100%;aspect-ratio:16/9;overflow:hidden;background:#000"><iframe width="100%" height="100%" src="https://www.youtube.com/embed/'+ytId+'?playsinline=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="display:block"></iframe></div>';
       } else {
         // TikTok болон бусад — линк товч харуулна
         media = '<a href="'+(p.videoUrl||'')+'" target="_blank" style="display:block;text-decoration:none">'
