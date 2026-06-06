@@ -1,33 +1,4 @@
 {
-  "portfolio": [
-    {
-      "id": 1780669583780,
-      "title": "QR код-Ажлын багаж хэрэгсэл",
-      "cat": "qr",
-      "type": "image",
-      "img": "https://smartajilmn.github.io/smartajil/qr.jpg"
-    },
-    {
-      "id": 1780669542666,
-      "title": "Спортын наадам-Видео урилга",
-      "cat": "invite",
-      "type": "video",
-      "videoId": "L_LpNWnItYE",
-      "videoUrl": "https://youtu.be/L_LpNWnItYE"
-    },
-    {
-      "id": 1780669498475,
-      "title": "Ажлын гар багаж-Вэб сайт",
-      "cat": "website",
-      "type": "video",
-      "videoId": "https://youtube.com/shorts/wOx3MZUR-1Y",
-      "videoUrl": "https://youtube.com/shorts/wOx3MZUR-1Y"
-    }
-  ],
-  "tickers": [
-    {
-      "id": 1780708776258,
-      "text": "Вэб сайт хийх үйлчилгээ маань эхний 10 харилцагч 20% хөнгөлөлттэй."
-    }
-  ]
+  "portfolio": [],
+  "tickers": []
 }
