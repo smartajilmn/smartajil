@@ -24,5 +24,10 @@
       "videoUrl": "https://youtube.com/shorts/wOx3MZUR-1Y"
     }
   ],
-  "tickers": []
+  "tickers": [
+    {
+      "id": 1780708776258,
+      "text": "Вэб сайт хийх үйлчилгээ маань эхний 10 харилцагч 20% хөнгөлөлттэй."
+    }
+  ]
 }
