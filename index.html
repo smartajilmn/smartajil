@@ -2622,6 +2622,62 @@
 var ADMIN_PASSWORD = 'smart2025';
 var GITHUB_REPO = 'smartajilmn/smartajil';
 var GITHUB_FILE = 'index.html';
+// ===== DATA.JSON - GitHub дээр жижиг файлд хадгалах =====
+var DATA_FILE = 'data.json';
+var DATA_URL = 'https://raw.githubusercontent.com/smartajilmn/smartajil/main/data.json';
+
+function loadFromDataJson(){
+  fetch(DATA_URL + '?t=' + Date.now())
+  .then(function(r){ return r.json(); })
+  .then(function(data){
+    if(data.portfolio && data.portfolio.length){
+      localStorage.setItem(PORT_KEY, JSON.stringify(data.portfolio));
+    }
+    if(data.tickers && data.tickers.length){
+      localStorage.setItem('smartajil_tickers', JSON.stringify(data.tickers));
+    }
+    renderPortfolio();
+    renderTicker();
+  })
+  .catch(function(){ renderPortfolio(); renderTicker(); });
+}
+
+function saveDataJson(portfolioItems, tickerItems){
+  var token = getSettings().ghToken;
+  if(!token){ console.log('GitHub token байхгүй'); return; }
+
+  // Эхлээд data.json-ий SHA авах
+  fetch('https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + DATA_FILE, {
+    headers: {'Authorization': 'token ' + token, 'Accept': 'application/vnd.github.v3+json'}
+  })
+  .then(function(r){ return r.json(); })
+  .then(function(fileData){
+    var newData = {
+      portfolio: portfolioItems || JSON.parse(localStorage.getItem(PORT_KEY)||'[]'),
+      tickers: tickerItems || JSON.parse(localStorage.getItem('smartajil_tickers')||'[]')
+    };
+    var encoded = btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))));
+    return fetch('https://api.github.com/repos/' + GITHUB_REPO + '/contents/' + DATA_FILE, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'token ' + token,
+        'Accept': 'application/vnd.github.v3+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Өгөгдөл шинэчлэгдлээ',
+        content: encoded,
+        sha: fileData.sha,
+        branch: 'main'
+      })
+    });
+  })
+  .then(function(r){
+    if(r && r.ok){ console.log('✅ data.json хадгалагдлаа'); }
+  })
+  .catch(function(e){ console.log('❌ data.json save error:', e); });
+}
+
 var STORAGE_KEY = 'smartajil_jobs';
 var PORT_KEY = 'smartajil_portfolio';
 var SETT_KEY = 'smartajil_settings';
@@ -2728,51 +2784,13 @@ function getJobs(){try{var s=localStorage.getItem(STORAGE_KEY);return s?JSON.par
 function saveJobs(j){localStorage.setItem(STORAGE_KEY,JSON.stringify(j));}
 function getPortfolio(){try{var s=localStorage.getItem(PORT_KEY);var local=s?JSON.parse(s):[];return local.length?local:DEFAULT_PORTFOLIO;}catch(e){return DEFAULT_PORTFOLIO;}}
 function savePortfolio2(p){
-  localStorage.setItem(PORT_KEY,JSON.stringify(p));
-  savePortfolioToGitHub(p);
+  localStorage.setItem(PORT_KEY, JSON.stringify(p));
+  saveDataJson(p, null);
 }
 
-function savePortfolioToGitHub(portfolioItems){
-  // Одоогийн файлын SHA авах
-  fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
-    headers:{'Authorization':'token '+getSettings().ghToken,'Accept':'application/vnd.github.v3+json'}
-  })
-  .then(function(r){return r.json();})
-  .then(function(fileData){
-    var sha = fileData.sha;
-    var currentContent = atob(fileData.content.replace(/\n/g,''));
-    // Portfolio DEFAULT_PORTFOLIO-г шинэ өгөгдлөөр солих
-    var newPortfolio = JSON.stringify(portfolioItems);
-    var newContent = currentContent.replace(
-      /var DEFAULT_PORTFOLIO = \[[\s\S]*?\];/,
-      'var DEFAULT_PORTFOLIO = ' + newPortfolio + ';'
-    );
-    // Base64 encode
-    var encoded = btoa(unescape(encodeURIComponent(newContent)));
-    // GitHub-д хадгалах
-    return fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
-      method:'PUT',
-      headers:{
-        'Authorization':'token '+getSettings().ghToken,
-        'Accept':'application/vnd.github.v3+json',
-        'Content-Type':'application/json'
-      },
-      body:JSON.stringify({
-        message:'Portfolio шинэчлэгдлээ',
-        content:encoded,
-        sha:sha
-      })
-    });
-  })
-  .then(function(r){
-    if(r && r.ok){
-      console.log('GitHub-д амжилттай хадгалагдлаа');
-    }
-  })
-  .catch(function(e){console.log('GitHub save error:',e);});
-}
 
-function loadPortfolioFromBin(){
+
+function loadFromDataJson(){
   // DEFAULT_PORTFOLIO кодонд байгаа тул онцгой татах шаардлагагүй
   renderPortfolio();
 }
@@ -3541,32 +3559,10 @@ var DEFAULT_TICKERS = [
 function getTickers(){ try{ var s=localStorage.getItem('smartajil_tickers'); var a=s?JSON.parse(s):[]; return a.length?a:DEFAULT_TICKERS; }catch(e){return DEFAULT_TICKERS;} }
 function saveTickers(a){
   localStorage.setItem('smartajil_tickers', JSON.stringify(a));
-  saveTickersToGitHub(a);
+  saveDataJson(null, a);
 }
 
-function saveTickersToGitHub(items){
-  var token = getSettings().ghToken;
-  if(!token) return;
-  fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
-    headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
-  })
-  .then(function(r){return r.json();})
-  .then(function(fileData){
-    var currentContent = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g,''))));
-    var newTickers = JSON.stringify(items);
-    var newContent = currentContent.replace(
-      /var DEFAULT_TICKERS = \[[\s\S]*?\];/,
-      'var DEFAULT_TICKERS = '+newTickers+';'
-    );
-    var encoded = btoa(unescape(encodeURIComponent(newContent)));
-    return fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
-      method:'PUT',
-      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
-      body:JSON.stringify({message:'Урсдаг зар шинэчлэгдлээ',content:encoded,sha:fileData.sha,branch:'main'})
-    });
-  })
-  .catch(function(e){console.log('Ticker save error:',e);});
-}
+
 
 function renderTicker(){
   var items = getTickers();
