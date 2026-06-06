@@ -1345,7 +1345,58 @@
   }
   .ticker-wrap.hidden { display: none; }
 
-  /* ===== NEWS SECTION ===== */
+  /* ===== BOTTOM TICKER ===== */
+  .bottom-ticker {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(90deg, #0a2a1f, #0D1F1A, #0a2a1f);
+    border-top: 1px solid rgba(29,158,117,0.4);
+    padding: 10px 0;
+    z-index: 9999;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+  }
+  .bottom-ticker-label {
+    background: var(--green);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-right: 8px;
+    letter-spacing: 1px;
+  }
+  .bottom-ticker-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: bottomTickerScroll 25s linear infinite;
+    gap: 60px;
+  }
+  .bottom-ticker-track:hover { animation-play-state: paused; }
+  @keyframes bottomTickerScroll {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  .bottom-ticker-item {
+    color: #c8e6c9;
+    font-size: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bottom-ticker-dot {
+    width: 6px; height: 6px;
+    background: var(--gold);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+/* ===== NEWS SECTION ===== */
   .news-section {
     background: #0a0a0a;
     padding: 80px 60px;
@@ -3567,24 +3618,34 @@ function saveTickers(a){
 
 function renderTicker(){
   var items = getTickers();
+  // Хуучин ticker
   var track = document.getElementById('tickerTrack');
   var wrap = document.getElementById('tickerWrap');
-  if(!track || !wrap) return;
-  if(!items.length){
-    wrap.style.display = 'none';
-    return;
+  if(track && wrap){
+    if(!items.length){ wrap.style.display='none'; }
+    else {
+      wrap.style.display='block';
+      var html = items.concat(items).map(function(t){
+        return '<span class="ticker-item"><span class="ticker-dot"></span>'+escHtml(t.text)+'</span>';
+      }).join('');
+      track.innerHTML = html;
+    }
   }
-  wrap.style.display = 'block';
-  var html = items.concat(items).map(function(t){
-    return '<span class="ticker-item"><span class="ticker-dot"></span>'+escHtml(t.text)+'</span>';
+  // Шинэ доод ticker
+  var bTrack = document.getElementById('bottomTickerTrack');
+  var bWrap = document.getElementById('bottomTicker');
+  if(!bTrack || !bWrap) return;
+  if(!items.length){ bWrap.style.display='none'; return; }
+  bWrap.style.display='flex';
+  var bHtml = items.concat(items).map(function(t){
+    return '<span class="bottom-ticker-item"><span class="bottom-ticker-dot"></span>'+escHtml(t.text)+'</span>';
   }).join('');
-  track.innerHTML = html;
+  bTrack.innerHTML = bHtml;
   var totalChars = items.reduce(function(a,t){return a+t.text.length;},0);
-  var duration = Math.max(20, totalChars * 0.3) + 's';
-  // Animation restart
-  track.style.animation = 'none';
-  track.offsetHeight; // reflow
-  track.style.animation = 'tickerScroll ' + duration + ' linear infinite';
+  var dur = Math.max(20, totalChars * 0.25) + 's';
+  bTrack.style.animation = 'none';
+  bTrack.offsetHeight;
+  bTrack.style.animation = 'bottomTickerScroll ' + dur + ' linear infinite';
 }
 
 function openAddTicker(){
@@ -4007,5 +4068,12 @@ function closeMobileMenu(){
     </svg>
   </a>
 </div>
+<div class="bottom-ticker" id="bottomTicker" style="display:none">
+  <div class="bottom-ticker-label">📢 МЭДЭЭ</div>
+  <div style="overflow:hidden;flex:1;">
+    <div class="bottom-ticker-track" id="bottomTickerTrack"></div>
+  </div>
+</div>
+
 </body>
 </html>
