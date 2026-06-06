@@ -1615,6 +1615,11 @@
     <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;color:#555;">Facebook Хуудасны URL</label><input id="settFbUrl" style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;" placeholder="https://www.facebook.com/taniipage"><small style="font-size:11px;color:#aaa;display:block;margin-top:2px">Facebook хуудсандаа орж URL-г хуулна уу</small></div>
     <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;color:#555;">JSONBin API Key <small style="color:#aaa">(ажлын зар хэн ч нэмэх)</small></label><input id="settBinKey" style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;" placeholder="$2b$10$..."></div>
     <div><label style="font-size:12px;font-weight:600;display:block;margin-bottom:4px;color:#555;">JSONBin Bin ID</label><input id="settBinId" style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;" placeholder="64a1b2c3d4e5f..."><small style="font-size:11px;color:#aaa;display:block;margin-top:2px">jsonbin.io → бүртгүүл → шинэ bin → ID хуулах</small></div>
+  <div>
+    <label style="font-size:13px;font-weight:500;color:#333;display:block;margin-bottom:4px">⚙️ GitHub Token <small style="color:#aaa">(auto-save)</small></label>
+    <input id="settGhToken" type="password" placeholder="ghp_..." style="width:100%;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:8px;font-size:14px;box-sizing:border-box;">
+    <small style="font-size:11px;color:#aaa;display:block;margin-top:2px">GitHub → Settings → Developer settings → Personal access tokens → repo эрхтэй</small>
+  </div>
   </div>
   <div style="text-align:center;margin-top:12px;">
     <button onclick="saveSettings()" style="padding:9px 24px;background:#0F6E56;color:white;border:none;border-radius:8px;cursor:pointer;font-size:14px;font-weight:500;font-family:inherit;">Хадгалах</button>
@@ -1866,7 +1871,7 @@
       <h3>Вэбсайт хийх</h3>
       <p>Бизнесийн танилцуулга сайт, онлайн дэлгүүр, лэндинг хуудас — хурдан, хямд, мэргэжлийн.</p>
       <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
-        <span class="service-tag">Үнэ: 350,000–500,000₮</span>
+        <span class="service-tag">Үнэ: 500,000–1,500,000₮</span>
         <button class="service-cta" onclick="openOrder(5)">Захиалах →</button>
       </div>
     </div>
@@ -2521,7 +2526,7 @@
 
   var SYSTEM_PROMPT = "Чи Smart Ажил бизнесийн туслах chatbot. Монголоор товч тодорхой хариулна. " +
     "Smart Ажил бол Монголын ажлын байрны платформ. " +
-    "Үйлчилгээ: QR Код (25,000₮), Лого хийх (30,000–80,000₮), Постер хийх (35,000₮), Цахим урилга (10,000–40,000₮), Вэбсайт хийх (350,000–500,000₮), Өргөдөл загвар (10,000₮). " +
+    "Үйлчилгээ: QR Код (25,000₮), Лого хийх (30,000–80,000₮), Постер хийх (35,000₮), Цахим урилга (10,000–40,000₮), Вэбсайт хийх (500,000–1,500,000₮), Өргөдөл загвар (10,000₮). " +
     "Данс: 5400133881, Хаан банк, Б.Жайнагүль. " +
     "Утасны дугаар: 7211-7170. " +
     "Ажлын байр дээр өргөдөл гаргаж болно. " +
@@ -2615,6 +2620,8 @@
   }
 
 var ADMIN_PASSWORD = 'smart2025';
+var GITHUB_REPO = 'smartajilmn/smartajil';
+var GITHUB_FILE = 'index.html';
 var STORAGE_KEY = 'smartajil_jobs';
 var PORT_KEY = 'smartajil_portfolio';
 var SETT_KEY = 'smartajil_settings';
@@ -2624,8 +2631,8 @@ var SVC_KEY = 'smartajil_services';
 function getPrices(){
   try{var s=localStorage.getItem(PRICE_KEY);return s?JSON.parse(s):{
     qr:25000,logoMin:30000,logoMax:80000,poster:35000,
-    inviteMin:10000,inviteMax:40000,webMin:350000,webMax:500000,cv:10000
-  };}catch(e){return{qr:25000,logoMin:30000,logoMax:80000,poster:35000,inviteMin:10000,inviteMax:40000,webMin:350000,webMax:500000,cv:10000};}
+    inviteMin:10000,inviteMax:40000,webMin:500000,webMax:1500000,cv:10000
+  };}catch(e){return{qr:25000,logoMin:30000,logoMax:80000,poster:35000,inviteMin:10000,inviteMax:40000,webMin:500000,webMax:1500000,cv:10000};}
 }
 function savePrices(p){localStorage.setItem(PRICE_KEY,JSON.stringify(p));}
 
@@ -2690,12 +2697,18 @@ var SERVICES = {
   2:{name:'Лого хийх',min:30000,max:80000},
   3:{name:'Постер хийх',min:35000,max:35000},
   4:{name:'Цахим урилга',min:10000,max:40000},
-  5:{name:'Вэбсайт хийх',min:350000,max:500000},
+  5:{name:'Вэбсайт хийх',min:500000,max:1500000},
   6:{name:'Өргөдөл загвар',min:10000,max:10000}
 };
 
 var CAT_LABELS = {logo:'Лого',poster:'Постер',invite:'Цахим урилга',website:'Вэбсайт',qr:'QR Код'};
 var CAT_ICONS  = {logo:'✨',poster:'🎨',invite:'💌',website:'🌐',qr:'📱'};
+
+var DEFAULT_PORTFOLIO = [
+  {id:101, title:'Smart Ажил танилцуулга', cat:'poster', type:'video', videoId:'wOx3MZUR-1Y'},
+  {id:102, title:'Smart Ажил үйлчилгээ', cat:'website', type:'video', videoId:'L_LpNWnItYE'},
+  {id:103, title:'Smart Ажил QR Код', cat:'qr', type:'image', img:'https://smartajilmn.github.io/smartajil/qr.jpg'}
+];
 
 var DEFAULT_JOBS = [
   {id:1,company:'МонголНет',location:'Улаанбаатар',title:'Програм хангамжийн инженер',type:'Бүтэн цагийн',tags:['JavaScript','React'],salary:'₮2.5–3.5 сая',color:'#1D9E75',initials:'МН'},
@@ -2713,40 +2726,55 @@ var pfFilter = 'all';
 // ---- STORAGE ----
 function getJobs(){try{var s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):DEFAULT_JOBS;}catch(e){return DEFAULT_JOBS;}}
 function saveJobs(j){localStorage.setItem(STORAGE_KEY,JSON.stringify(j));}
-function getPortfolio(){try{var s=localStorage.getItem(PORT_KEY);return s?JSON.parse(s):[];}catch(e){return[];}}
+function getPortfolio(){try{var s=localStorage.getItem(PORT_KEY);var local=s?JSON.parse(s):[];return local.length?local:DEFAULT_PORTFOLIO;}catch(e){return DEFAULT_PORTFOLIO;}}
 function savePortfolio2(p){
   localStorage.setItem(PORT_KEY,JSON.stringify(p));
-  // Firestore-д хадгалах (бүх төхөөрөмжид харагдана)
-  if(window.savePortfolioToFirestore){
-    window.savePortfolioToFirestore(p);
-  }
+  savePortfolioToGitHub(p);
+}
+
+function savePortfolioToGitHub(portfolioItems){
+  // Одоогийн файлын SHA авах
+  fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+    headers:{'Authorization':'token '+getSettings().ghToken,'Accept':'application/vnd.github.v3+json'}
+  })
+  .then(function(r){return r.json();})
+  .then(function(fileData){
+    var sha = fileData.sha;
+    var currentContent = atob(fileData.content.replace(/\n/g,''));
+    // Portfolio DEFAULT_PORTFOLIO-г шинэ өгөгдлөөр солих
+    var newPortfolio = JSON.stringify(portfolioItems);
+    var newContent = currentContent.replace(
+      /var DEFAULT_PORTFOLIO = \[[\s\S]*?\];/,
+      'var DEFAULT_PORTFOLIO = ' + newPortfolio + ';'
+    );
+    // Base64 encode
+    var encoded = btoa(unescape(encodeURIComponent(newContent)));
+    // GitHub-д хадгалах
+    return fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+      method:'PUT',
+      headers:{
+        'Authorization':'token '+getSettings().ghToken,
+        'Accept':'application/vnd.github.v3+json',
+        'Content-Type':'application/json'
+      },
+      body:JSON.stringify({
+        message:'Portfolio шинэчлэгдлээ',
+        content:encoded,
+        sha:sha
+      })
+    });
+  })
+  .then(function(r){
+    if(r && r.ok){
+      console.log('GitHub-д амжилттай хадгалагдлаа');
+    }
+  })
+  .catch(function(e){console.log('GitHub save error:',e);});
 }
 
 function loadPortfolioFromBin(){
-  // Firestore-оос татах (бүх төхөөрөмжид ижил өгөгдөл)
-  if(window.loadPortfolioFromFirestore){
-    window.loadPortfolioFromFirestore(function(items){
-      if(items && items.length){
-        localStorage.setItem(PORT_KEY, JSON.stringify(items));
-        renderPortfolio();
-      }
-    });
-  } else {
-    // JSONBin fallback
-    var st=getSettings();
-    if(!st.binKey||!st.binId) return;
-    fetch('https://api.jsonbin.io/v3/b/'+st.binId+'/latest',{
-      headers:{'X-Master-Key':st.binKey,'X-Bin-Meta':'false'}
-    })
-    .then(function(r){return r.json();})
-    .then(function(data){
-      if(data&&data.portfolio&&data.portfolio.length){
-        localStorage.setItem(PORT_KEY,JSON.stringify(data.portfolio));
-        renderPortfolio();
-      }
-    })
-    .catch(function(){});
-  }
+  // DEFAULT_PORTFOLIO кодонд байгаа тул онцгой татах шаардлагагүй
+  renderPortfolio();
 }
 function getSettings(){try{var s=localStorage.getItem(SETT_KEY);return s?JSON.parse(s):{phone:'7211-7170',bank:'5400133881',owner:'Б.Жайнагүль',bankName:'Хаан банк'};}catch(e){return{phone:'7211-7170',bank:'5400133881',owner:'Б.Жайнагүль',bankName:'Хаан банк'};}}
 
@@ -3080,6 +3108,7 @@ function toggleAdminSettings(){
     document.getElementById('settFbUrl').value = s.fbUrl||'';
     document.getElementById('settBinKey').value = s.binKey||'';
     document.getElementById('settBinId').value = s.binId||'';
+    if(document.getElementById('settGhToken')) document.getElementById('settGhToken').value = s.ghToken||'';
   }
   el.style.display = hidden ? 'block' : 'none';
 }
@@ -3098,6 +3127,7 @@ function applyFbUrl(url){
 
 function saveSettings(){
   var s = {
+    ghToken: document.getElementById('settGhToken') ? document.getElementById('settGhToken').value.trim() : (getSettings().ghToken||''),
     phone: document.getElementById('settPhone').value.trim() || '7211-7170',
     qpayQr: document.getElementById('settQpayQr').value.trim() || '',
     bank: document.getElementById('settBank').value.trim() || '5400133881',
@@ -3871,11 +3901,11 @@ function closeMobileMenu(){
       </div>
       <div class="form-group">
         <label>🌐 Вэбсайт хийх — Доод үнэ (₮)</label>
-        <input type="number" id="tePriceWebMin" placeholder="350000" style="background:#1a1a1a;color:#f0ece0;">
+        <input type="number" id="tePriceWebMin" placeholder="500000" style="background:#1a1a1a;color:#f0ece0;">
       </div>
       <div class="form-group">
         <label>🌐 Вэбсайт хийх — Дээд үнэ (₮)</label>
-        <input type="number" id="tePriceWebMax" placeholder="500000" style="background:#1a1a1a;color:#f0ece0;">
+        <input type="number" id="tePriceWebMax" placeholder="1500000" style="background:#1a1a1a;color:#f0ece0;">
       </div>
       <div class="form-group">
         <label>📄 Өргөдөл загвар — Үнэ (₮)</label>
