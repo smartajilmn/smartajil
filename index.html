@@ -3534,8 +3534,39 @@ function deleteNews(id){
 }
 
 // ---- TICKER ----
-function getTickers(){ try{ return JSON.parse(localStorage.getItem('smartajil_tickers')||'[]'); }catch(e){return[];} }
-function saveTickers(a){ localStorage.setItem('smartajil_tickers', JSON.stringify(a)); }
+var DEFAULT_TICKERS = [
+  {id:1, text:'Вэб сайт эхний 10 харилцагч 20% хөнгөлөлт'}
+];
+
+function getTickers(){ try{ var s=localStorage.getItem('smartajil_tickers'); var a=s?JSON.parse(s):[]; return a.length?a:DEFAULT_TICKERS; }catch(e){return DEFAULT_TICKERS;} }
+function saveTickers(a){
+  localStorage.setItem('smartajil_tickers', JSON.stringify(a));
+  saveTickersToGitHub(a);
+}
+
+function saveTickersToGitHub(items){
+  var token = getSettings().ghToken;
+  if(!token) return;
+  fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+    headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}
+  })
+  .then(function(r){return r.json();})
+  .then(function(fileData){
+    var currentContent = decodeURIComponent(escape(atob(fileData.content.replace(/\n/g,''))));
+    var newTickers = JSON.stringify(items);
+    var newContent = currentContent.replace(
+      /var DEFAULT_TICKERS = \[[\s\S]*?\];/,
+      'var DEFAULT_TICKERS = '+newTickers+';'
+    );
+    var encoded = btoa(unescape(encodeURIComponent(newContent)));
+    return fetch('https://api.github.com/repos/'+GITHUB_REPO+'/contents/'+GITHUB_FILE,{
+      method:'PUT',
+      headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json','Content-Type':'application/json'},
+      body:JSON.stringify({message:'Урсдаг зар шинэчлэгдлээ',content:encoded,sha:fileData.sha,branch:'main'})
+    });
+  })
+  .catch(function(e){console.log('Ticker save error:',e);});
+}
 
 function renderTicker(){
   var items = getTickers();
