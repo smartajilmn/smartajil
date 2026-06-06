@@ -1,0 +1,31 @@
+{
+  "portfolio": [
+    {
+      "id": 101,
+      "title": "Smart Ажил танилцуулга",
+      "cat": "poster",
+      "type": "video",
+      "videoId": "wOx3MZUR-1Y"
+    },
+    {
+      "id": 102,
+      "title": "Smart Ажил үйлчилгээ",
+      "cat": "website",
+      "type": "video",
+      "videoId": "L_LpNWnItYE"
+    },
+    {
+      "id": 103,
+      "title": "Smart Ажил QR Код",
+      "cat": "qr",
+      "type": "image",
+      "img": "https://smartajilmn.github.io/smartajil/qr.jpg"
+    }
+  ],
+  "tickers": [
+    {
+      "id": 1,
+      "text": "Вэб сайт эхний 10 харилцагч 20% хөнгөлөлт"
+    }
+  ]
+}
