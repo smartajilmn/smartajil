@@ -2632,11 +2632,13 @@ function loadFromDataJson(){
   fetch(DATA_URL + '?t=' + Date.now())
   .then(function(r){ return r.json(); })
   .then(function(data){
-    if(data.portfolio && data.portfolio.length){
+    if(data.portfolio){
       localStorage.setItem(PORT_KEY, JSON.stringify(data.portfolio));
     }
     if(data.tickers && data.tickers.length){
       localStorage.setItem('smartajil_tickers', JSON.stringify(data.tickers));
+    } else if(data.tickers && data.tickers.length === 0) {
+      localStorage.removeItem('smartajil_tickers');
     }
     renderPortfolio();
     renderTicker();
@@ -3555,7 +3557,7 @@ var DEFAULT_TICKERS = [
   {id:1, text:'Вэб сайт эхний 10 харилцагч 20% хөнгөлөлт'}
 ];
 
-function getTickers(){ try{ var s=localStorage.getItem('smartajil_tickers'); var a=s?JSON.parse(s):[]; return a.length?a:DEFAULT_TICKERS; }catch(e){return DEFAULT_TICKERS;} }
+function getTickers(){ try{ var s=localStorage.getItem('smartajil_tickers'); return s?JSON.parse(s):DEFAULT_TICKERS; }catch(e){return DEFAULT_TICKERS;} }
 function saveTickers(a){
   localStorage.setItem('smartajil_tickers', JSON.stringify(a));
   saveDataJson(null, a);
