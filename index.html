@@ -3569,20 +3569,22 @@ function renderTicker(){
   var items = getTickers();
   var track = document.getElementById('tickerTrack');
   var wrap = document.getElementById('tickerWrap');
+  if(!track || !wrap) return;
   if(!items.length){
-    wrap.classList.add('hidden');
+    wrap.style.display = 'none';
     return;
   }
-  wrap.classList.remove('hidden');
-  // duplicate for seamless loop
+  wrap.style.display = 'block';
   var html = items.concat(items).map(function(t){
-    return '<div class="ticker-item"><div class="ticker-dot"></div>'+escHtml(t.text)+'</div>';
+    return '<span class="ticker-item"><span class="ticker-dot"></span>'+escHtml(t.text)+'</span>';
   }).join('');
   track.innerHTML = html;
-  // adjust speed based on length
   var totalChars = items.reduce(function(a,t){return a+t.text.length;},0);
-  var duration = Math.max(15, totalChars * 0.4) + 's';
-  track.style.animationDuration = duration;
+  var duration = Math.max(20, totalChars * 0.3) + 's';
+  // Animation restart
+  track.style.animation = 'none';
+  track.offsetHeight; // reflow
+  track.style.animation = 'tickerScroll ' + duration + ' linear infinite';
 }
 
 function openAddTicker(){
