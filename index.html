@@ -2790,10 +2790,7 @@ function savePortfolio2(p){
 
 
 
-function loadFromDataJson(){
-  // DEFAULT_PORTFOLIO кодонд байгаа тул онцгой татах шаардлагагүй
-  renderPortfolio();
-}
+
 function getSettings(){try{var s=localStorage.getItem(SETT_KEY);return s?JSON.parse(s):{phone:'7211-7170',bank:'5400133881',owner:'Б.Жайнагүль',bankName:'Хаан банк'};}catch(e){return{phone:'7211-7170',bank:'5400133881',owner:'Б.Жайнагүль',bankName:'Хаан банк'};}}
 
 function fmt(n){return String.fromCharCode(8366)+n.toLocaleString();}
@@ -3647,6 +3644,7 @@ var _origDoLogin = window.doLogin;
 // ---- INIT NEW FEATURES ----
 renderNews();
 renderTicker();
+loadFromDataJson();
 applyPageTexts();
 applyPricesAndServices();
 
